@@ -10,6 +10,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip # pip이 패키지를 저장하는 위치
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }} # key는 캐시를 구분하는 식별자. hashFiles('requirements.txt')는 requirements.txt 내용의 해시값. 파일이 바뀌면 해시가 바뀜 -> 캐시 무효화 -> 새로 설치
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -22,6 +26,10 @@ jobs:
     runs-on: ubuntu-latest # 실행 환경 (ubuntu-latest Runner 서버 한 대를 새로 띄움)
     steps:
       - uses: actions/checkout@v4 # 1. Runner는 비어있는 서버라서 코드가 없는데, 이 Action이 레포 코드를 Runner에 내려받음
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
       - uses: actions/setup-python@v5 # 2. 파이썬 설치 (with로 버전을 지정하지 않으면 기본값이 설치됨)
         with:
           python-version: "3.12"
