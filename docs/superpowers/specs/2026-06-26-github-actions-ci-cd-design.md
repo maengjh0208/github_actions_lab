@@ -14,7 +14,7 @@
 
 | Phase | 제목 | 상태 | 메모 |
 |-------|------|------|------|
-| 1 | GitHub Actions 기초 + 첫 번째 CI | ⬜ 미시작 | |
+| 1 | GitHub Actions 기초 + 첫 번째 CI | ✅ 완료 | 2026-06-26 |
 | 2 | 실전 CI 파이프라인 | ⬜ 미시작 | |
 | 3 | Branch 전략 + PR 자동화 | ⬜ 미시작 | |
 | 4 | CD — Render 자동 배포 | ⬜ 미시작 | |
@@ -22,7 +22,7 @@
 | 6 | Reusable Workflows | ⬜ 미시작 | |
 
 ### 다음 할 일
-- [ ] Phase 1 시작: FastAPI 앱 뼈대 생성 + 첫 워크플로우 작성
+- [ ] Phase 2 시작: lint job 추가 (ruff + black), 캐시, Matrix build
 
 ### 재개 방법
 1. 이 파일의 "진행 현황" 표에서 마지막으로 완료된 Phase 확인
