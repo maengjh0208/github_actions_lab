@@ -24,14 +24,17 @@ jobs:
 
   test:
     runs-on: ubuntu-latest # 실행 환경 (ubuntu-latest Runner 서버 한 대를 새로 띄움)
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12"]
     steps:
       - uses: actions/checkout@v4 # 1. Runner는 비어있는 서버라서 코드가 없는데, 이 Action이 레포 코드를 Runner에 내려받음
       - uses: actions/cache@v4
         with:
           path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('requirements.txt') }}
       - uses: actions/setup-python@v5 # 2. 파이썬 설치 (with로 버전을 지정하지 않으면 기본값이 설치됨)
         with:
-          python-version: "3.12"
+          python-version: ${{ matrix.python-version }}
       - run: pip install -r requirements.txt # 3. 의존성 설치 (매번 새로운 Runner 라서항상 새로 설치해야 함)
       - run: pytest -v # 4. 테스트 코드 실행 (실패하면 워크플로우 전체가 실패 처리됨)
