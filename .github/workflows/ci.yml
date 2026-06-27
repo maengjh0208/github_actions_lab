@@ -1,8 +1,15 @@
 # 워크플로우 이름
 name: CI
 
-# 트리거 - 언제 실행할 지 (모든 브랜치에 push 될 때마다 실행)
-on: push
+# 트리거 - 언제 실행할 지
+on:
+  push:
+    branches:
+      - "feature/**"
+      - "hotfix/**"
+  pull_request:
+    branches:
+      - main
 
 # jobs 선언 + job 이름
 jobs:
