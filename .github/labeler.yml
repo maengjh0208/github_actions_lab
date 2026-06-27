@@ -1,0 +1,7 @@
+# label 규칙 정의
+
+feature:
+  - head-branch: ["^feature/"] # "feature/" 로 시작하는 PR
+
+hotfix:
+  - head-branch: ["^hotfix/"] # "hotfix/" 로 시작하는 PR

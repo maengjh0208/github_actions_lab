@@ -1,0 +1,16 @@
+name: Labeler
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  label:
+    runs-on: ubuntu-latest
+    permissions: # permission은 이 워크플로우가 PR에 라벨을 붙이는 권한을 갖도록 명시하는 것.
+      contents: read # 레포 코드를 읽을 수 있음
+      pull-requests: write # PR에 라벨/코멘트를 쓸 수 있음. write 권한이 없으면 라벨 붙이려고 할 때 403 에러 발생함.
+    steps:
+      - uses: actions/labeler@v5
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }} # Github API 호출할 때 인증으로 쓰는 토큰. GITHUB_TOKEN은 Actions가 자동으로 발급해주는 임시 토큰이어서 별도 등록 필요 없음.
