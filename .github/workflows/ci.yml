@@ -19,7 +19,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/cache@v4
         with:
-          path: ~/.cache/pip # pip이 패키지를 저장하는 위치
+          path: ~/.cache/pip # pip 이 패키지를 저장하는 위치
           key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }} # key는 캐시를 구분하는 식별자. hashFiles('requirements.txt')는 requirements.txt 내용의 해시값. 파일이 바뀌면 해시가 바뀜 -> 캐시 무효화 -> 새로 설치
       - uses: actions/setup-python@v5
         with:
