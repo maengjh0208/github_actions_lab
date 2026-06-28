@@ -16,13 +16,13 @@
 |-------|------|------|------|
 | 1 | GitHub Actions 기초 + 첫 번째 CI | ✅ 완료 | 2026-06-26 |
 | 2 | 실전 CI 파이프라인 | ✅ 완료 | 2026-06-27 |
-| 3 | Branch 전략 + PR 자동화 | ⬜ 미시작 | |
+| 3 | Branch 전략 + PR 자동화 | ✅ 완료 | 2026-06-28 |
 | 4 | CD — Render 자동 배포 | ⬜ 미시작 | |
 | 5 | Environments + 수동 승인 게이트 | ⬜ 미시작 | |
 | 6 | Reusable Workflows | ⬜ 미시작 | |
 
 ### 다음 할 일
-- [ ] Phase 3 시작: Branch Protection Rules 설정, PR 자동 라벨링, 테스트 결과 PR 코멘트
+- [ ] Phase 4 시작: Dockerfile 작성, GHCR 이미지 빌드/푸시, Render 배포 연동
 
 ### 재개 방법
 1. 이 파일의 "진행 현황" 표에서 마지막으로 완료된 Phase 확인
