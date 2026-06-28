@@ -3,10 +3,6 @@ name: CI
 
 # 트리거 - 언제 실행할 지
 on:
-  push:
-    branches:
-      - "feature/**"
-      - "hotfix/**"
   pull_request:
     branches:
       - main
