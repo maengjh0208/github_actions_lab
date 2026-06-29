@@ -5,6 +5,22 @@
 #     3. Docker 이미지 빌드 + 푸시 (태그 2개: latest, 커밋 SHA)
 #     4. Render Deploy Hook 호출
 
+# #############################################################
+
+# 현재 build-and-deploy 하나짜리를 아래 구조로 변경:
+
+# build          → Docker 빌드 + GHCR push
+#   ↓
+# deploy-staging → staging 서버에 배포 (자동)
+#   ↓
+# deploy-production → production 서버에 배포 (승인 대기)
+
+# 핵심 개념 — environment: 키
+
+# Job에 environment: 를 선언하면:
+# 1. 해당 Environment에 등록된 secrets가 주입됨
+# 2. Protection rules(Required reviewers)가 적용됨
+
 name: CD
 
 on:
@@ -13,7 +29,8 @@ on:
       - main
 
 jobs:
-  build-and-deploy:
+  # 1. build (docker login + build-push)
+  build:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -29,7 +46,20 @@ jobs:
         with:
           push: true
           tags:
-            | # 태그 동시에 2개 붙이기. github.repository가 username/repo 형태로 자동 확장되기 때문에 실제로 저장되는 이름은 ghcr.io/maengjh0208/github_actions-lab:latest 와 같은 형태.
+            | # 태그 동시에 2개 붙이기. github.repository가 username/repo 형태로 자동 확장되기 때문에 실제로 저장되는 이름은 ghcr.io/maengjh0208/github_actions_lab:latest 와 같은 형태.
             ghcr.io/${{ github.repository }}:latest
             ghcr.io/${{ github.repository }}:${{ github.sha }}
+  # 2. deploy-staging → staging 서버에 배포 (자동). deploy-staging, deploy-production은 Render에 신호만 보내면 되서, permissions, checkout 없어도 괜찮음.
+  deploy-staging:
+    runs-on: ubuntu-latest
+    needs: build # build 완료 후 실행
+    environment: staging # staging Environment secrets 사용
+    steps:
       - run: curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK_URL }} # Render Deploy Hook 호출 (Render에게 새 이미지 올라갔으니 배포하라고 신호 보냄). Render는 이 요청을 받으면 GHCR 에서 latest 이미지를 pull 하고, 기존 컨테이너를 새 이미지로 교체함. 그리고 서비스 재시작.
+  # 3. deploy-production → production 서버에 배포 (승인 대기)
+  deploy-production:
+    runs-on: ubuntu-latest
+    needs: deploy-staging # staging 배포 후 실행
+    environment: production # production Environment -> 승인 대기 조건 있음
+    steps:
+      - run: curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
