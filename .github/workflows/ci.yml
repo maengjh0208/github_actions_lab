@@ -26,3 +26,6 @@ jobs:
     with:
       python-version: "3.12"
     secrets: inherit # GITHUB_TOKEN을 비록한 secrets는 호출자 ci.yml 컨텍스트에 있음. reusable workflow는 별도 컨텍스트에서 실행되므로 Inherit을 붙여야 PR 코멘트 작성 등에서 GITHUB_TOKEN을 쓸 수 있음.
+    permissions:
+      contents: read
+      pull-requests: write
