@@ -1,0 +1,24 @@
+# action.yml은 Action의 진입점. 이 경로 자체가 Action의 이름.
+# uses: ./.github/actions/setup-python-env 로 호출하게 됨.
+
+name: Setup Python Environment
+description: Python 설치 + pip 캐시 + 의존성 설치
+
+inputs:
+  python-version:
+    description: Python version to use
+    required: false
+    default: "3.12"
+
+runs:
+  using: composite # 'composite': 여러 step을 묶는다는 선언.
+  steps:
+    - uses: actions/cache@v4
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('requirements.txt') }}
+    - uses: actions/setup-python@v5
+      with:
+        python-version: ${{ inputs.python-version }}
+    - run: pip install -r requirements.txt
+      shell: bash # composite action 에서 'run: step'은 반드시 'shell: bash'를 명시해야 함. 일반 workflow에서는 자동으로 붙지만, composite에서는 필수.
