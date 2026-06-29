@@ -19,12 +19,12 @@
 | 3 | Branch 전략 + PR 자동화 | ✅ 완료 | 2026-06-28 |
 | 4 | CD — Render 자동 배포 | ✅ 완료 | 2026-06-29 |
 | 5 | Environments + 수동 승인 게이트 | ✅ 완료 | 2026-06-29 |
-| 6 | Reusable Workflows | ⬜ 미시작 | |
+| 6 | Reusable Workflows | ✅ 완료 | 2026-06-29 |
 
 ### 다음 할 일
 - [x] Phase 4 완료: Dockerfile 작성, GHCR 이미지 빌드/푸시, Render 배포 연동
 - [x] Phase 5 완료: GitHub Environments 설정, staging/production 분리, 수동 승인 게이트
-- [ ] Phase 6 시작: Reusable Workflows, Composite Actions으로 팀 표준 구조 완성
+- [x] Phase 6 완료: Reusable Workflows, Composite Actions으로 팀 표준 구조 완성
 
 ### 재개 방법
 1. 이 파일의 "진행 현황" 표에서 마지막으로 완료된 Phase 확인
