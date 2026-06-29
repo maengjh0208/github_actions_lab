@@ -1,0 +1,50 @@
+# Reusable workflow는 on: workflow_call 트리거를 가진 워크플로우임.
+# 직접 실행되지 않고, 다른 워크플로우에서 uses: 로 호출될 떄만 실행됨.
+name: Reusable CI
+
+on:
+  workflow_call: # 외부에서 호출 가능하게 만드는 트리거
+    inputs:
+      python-version:
+        type: string
+        default: "3.12"
+        required: false
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-python-env # composite action 호출
+        with:
+          python-version: ${{ inputs.python-version }}
+      - run: |
+          ruff check .
+          black --check .
+  test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-python-env
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: pytest -v
+      - name: comment test results on PR
+        uses: actions/github-script@v7
+        if: always() # 이전 step이 실패해도 항상 실행. pytest가 실패해도 코멘트는 있어야 함.
+        with:
+          script: |
+            const outcome = '${{ job.status }}';
+            const emoji = outcome === 'success' ? '✅' : '❌';
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: `## CI Results\n${emoji} Test (Python ${{ matrix.python-version }}): ${outcome}`
+            });

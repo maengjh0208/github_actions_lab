@@ -1,3 +1,15 @@
+# ci.yml
+# - 역할: 트리거 정의
+# - 언제 실행할지만 담당
+
+# reusable-ci.yml
+# - 역할: job 묶음
+# - 여러 job -> 한 줄 uses:
+
+# action.yml
+# - step 묶음
+# - 여러 step -> 한 줄 uses:
+
 # 워크플로우 이름
 name: CI
 
@@ -9,52 +21,11 @@ on:
 
 # jobs 선언 + job 이름
 jobs:
-  lint:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/cache@v4
-        with:
-          path: ~/.cache/pip # pip 이 패키지를 저장하는 위치
-          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }} # key는 캐시를 구분하는 식별자. hashFiles('requirements.txt')는 requirements.txt 내용의 해시값. 파일이 바뀌면 해시가 바뀜 -> 캐시 무효화 -> 새로 설치
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-      - run: |
-          pip install -r requirements.txt
-          ruff check .
-          black --check .
-
-  test:
-    runs-on: ubuntu-latest # 실행 환경 (ubuntu-latest Runner 서버 한 대를 새로 띄움)
+  ci:
+    uses: ./.github/workflows/reusable-ci.yml
+    with:
+      python-version: "3.12"
+    secrets: inherit # GITHUB_TOKEN을 비록한 secrets는 호출자 ci.yml 컨텍스트에 있음. reusable workflow는 별도 컨텍스트에서 실행되므로 Inherit을 붙여야 PR 코멘트 작성 등에서 GITHUB_TOKEN을 쓸 수 있음.
     permissions:
       contents: read
       pull-requests: write
-    strategy:
-      matrix:
-        python-version: ["3.11", "3.12"]
-    steps:
-      - uses: actions/checkout@v4 # 1. Runner는 비어있는 서버라서 코드가 없는데, 이 Action이 레포 코드를 Runner에 내려받음
-      - uses: actions/cache@v4
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('requirements.txt') }}
-      - uses: actions/setup-python@v5 # 2. 파이썬 설치 (with로 버전을 지정하지 않으면 기본값이 설치됨)
-        with:
-          python-version: ${{ matrix.python-version }}
-      - run: pip install -r requirements.txt # 3. 의존성 설치 (매번 새로운 Runner 라서항상 새로 설치해야 함)
-      - run: pytest -v # 4. 테스트 코드 실행 (실패하면 워크플로우 전체가 실패 처리됨)
-      # CI가 완료되면 PR 페이지에 테스트 결과가 자동으로 코멘트 달리도록 함.
-      - name: comment test results on PR # step에 이름 붙이는 것. Actions 탭 로그에서 식별하기 쉬워짐
-        uses: actions/github-script@v7
-        if: always() # 이전 step이 실패해도 항상 실행. pytest가 실패해도 코멘트는 있어야 함.
-        with:
-          script: |
-            const outcome = '${{ job.status }}';
-            const emoji = outcome === 'success' ? '✅' : '❌';
-            await github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-              body: `## CI Results\n${emoji} Test (Python ${{ matrix.python-version }}): ${outcome}`
-            });
