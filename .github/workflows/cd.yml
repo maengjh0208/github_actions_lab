@@ -20,15 +20,16 @@ jobs:
       packages: write
     steps:
       - uses: actions/checkout@v4
-      - uses: docker/login-action@v3 # GHCR 로그인
+      - uses: docker/login-action@v3 # GHCR 로그인. 로그인을 해야 이후 이미지를 push할 수 있는 권한이 생김
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - uses: docker/build-push-action@v6
+      - uses: docker/build-push-action@v6 # 루트에 있는 Dockerfile을 자동으로 찾아서 이미지를 빌드. 빌드 완료 후 태그 2개를 동시에 붙여서 GHCR에 push.
         with:
           push: true
-          tags: | # 태그 동시에 2개 붙이기
+          tags:
+            | # 태그 동시에 2개 붙이기. github.repository가 username/repo 형태로 자동 확장되기 때문에 실제로 저장되는 이름은 ghcr.io/maengjh0208/github_actions-lab:latest 와 같은 형태.
             ghcr.io/${{ github.repository }}:latest
             ghcr.io/${{ github.repository }}:${{ github.sha }}
-      - run: curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK_URL }} # Render Deploy Hook 호출
+      - run: curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK_URL }} # Render Deploy Hook 호출 (Render에게 새 이미지 올라갔으니 배포하라고 신호 보냄). Render는 이 요청을 받으면 GHCR 에서 latest 이미지를 pull 하고, 기존 컨테이너를 새 이미지로 교체함. 그리고 서비스 재시작.
